@@ -7,310 +7,379 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --bg:#0f172a; --glass: rgba(255,255,255,0.03); }
-        body { background-color: var(--bg); color: white; font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
-        .glass { background: var(--glass); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.06); }
-        input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width:22px; height:22px; background:#3b82f6; border-radius:50%; border:2px solid white; }
-        .hidden { display:none!important }
-        /* Simple banner mockup */
-        .mock { min-height:120px; border-radius:12px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; }
-        .file-preview { max-height:120px; object-fit:contain; border-radius:8px; }
+        /* === VIBE & VISUALS === */
+        :root {
+            --bg-1: #041025;
+            --bg-2: #021226;
+            --muted: rgba(255, 255, 255, 0.70);
+            --label: rgba(255, 255, 255, 0.86);
+            --placeholder: rgba(255, 255, 255, 0.44);
+            --accent-start: #1a6cff;
+            --accent-end: #00c2ff;
+            --glass-border: rgba(255, 255, 255, 0.03);
+            --input-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.02));
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 15% 10%, rgba(8, 30, 70, 0.45), transparent 12%),
+                        linear-gradient(180deg, var(--bg-1), var(--bg-2) 60%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto; 
+        }
+
+        /* === ANIMATED BACKGROUNDS === */
+        .bg-glow { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        .glow-large { position: absolute; width: 640px; height: 640px; left: -180px; top: -220px; background: radial-gradient(circle, #153f9f 0%, transparent 55%); filter: blur(60px); opacity: .55; animation: driftL 18s ease-in-out infinite; }
+        .glow-small { position: absolute; width: 480px; height: 480px; right: -160px; bottom: -160px; background: radial-gradient(circle, #00bde9 0%, transparent 55%); filter: blur(44px); opacity: .42; animation: driftS 20s ease-in-out infinite; }
+        @keyframes driftL { 0% { transform: translate3d(0, 0, 0) } 50% { transform: translate3d(24px, 14px, 0) } 100% { transform: translate3d(0, 0, 0) } }
+        @keyframes driftS { 0% { transform: translate3d(0, 0, 0) } 50% { transform: translate3d(-18px, -10px, 0) } 100% { transform: translate3d(0, 0, 0) } }
+
+        /* === CARD & FORM STYLING === */
+        .card-style {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            border-radius: 16px;
+            padding: 24px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0.015));
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 22px 60px rgba(2, 6, 14, 0.7);
+            backdrop-filter: blur(10px) saturate(120%);
+        }
+
+        /* INPUTS */
+        .custom-input, select.custom-input, textarea.custom-input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--input-bg);
+            color: #fff;
+            outline: none;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        /* SELECT SPECIFIC STYLING - Fix for dark mode dropdowns */
+        select.custom-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.65em auto;
+            padding-right: 2.5rem;
+        }
+        
+        /* This ensures the dropdown options are dark blue with white text */
+        select option {
+            background-color: var(--bg-1);
+            color: white;
+            padding: 10px;
+        }
+
+        .custom-input::placeholder { color: var(--placeholder); font-weight: 500; }
+        
+        .custom-input:focus {
+            box-shadow: 0 6px 30px rgba(26, 108, 255, 0.12);
+            border-color: rgba(26, 108, 255, 0.9);
+            transform: translateZ(0);
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--label);
+            margin-bottom: 6px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* === BUTTONS === */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent-start), var(--accent-end));
+            color: #031226;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(26, 108, 255, 0.15);
+            transition: transform 0.1s;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
+
+        /* === UTILS === */
+        .navbar-glass {
+            background: rgba(4, 16, 37, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .hidden { display: none !important; }
+        
     </style>
 </head>
 <body class="antialiased">
 
-<nav class="p-4 flex justify-between items-center bg-[#0f172a]/80 backdrop-blur-md sticky top-0 z-50 border-b border-white/5">
-    <div class="flex items-center space-x-3">
-        <img src="assets/logo.png" class="h-7 w-auto" alt="Zayn1x logo" onerror="this.src='https://img.icons8.com/color/48/1xbet.png'">
-        <div class="text-lg font-black tracking-tight"><span class="text-blue-400">ZAYN1x</span> <span class="text-xs text-gray-400 font-medium">| Request Banner</span></div>
+    <div class="bg-glow">
+        <div class="glow-large"></div>
+        <div class="glow-small"></div>
     </div>
-    <div id="userBadge" class="hidden flex items-center space-x-2 bg-blue-500/8 px-3 py-1 rounded-full border border-blue-500/10 tg-only">
-        <span id="topBarName" class="text-[11px] font-bold text-blue-300 uppercase tracking-tighter"></span>
-    </div>
-</nav>
-
-<section class="hero-gradient pt-8 pb-6 px-6 text-center">
-    <h1 class="animate__animated animate__fadeInDown text-2xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white via-blue-200 to-blue-500">
-        Request a Custom Banner
-    </h1>
-    <p class="text-[12px] text-gray-400">Fill the form — we’ll design and return a banner with your link ready to post.</p>
-</section>
-
-<main class="px-4 pb-36">
-    <div class="glass p-6 rounded-3xl shadow-xl border border-white/5 max-w-3xl mx-auto mt-6">
-        <h3 class="text-xs font-bold mb-4 text-blue-300 uppercase tracking-widest">Banner Request Form</h3>
-
-        <form id="bannerForm" class="space-y-4">
-            <!-- ========== REQUEST FORM INPUTS ========== -->
-<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-
-    <!-- Affiliate (auto-fill if in Telegram) -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Affiliate</label>
-        <input id="affiliate" name="affiliate" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm"
-               placeholder="@username or Name" />
-    </div>
-
-    <!-- Type -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Type</label>
-        <select id="type" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm">
-            <option value="Banner">Banner</option>
-            <option value="Player Registration Video">Player Registration Video</option>
-            <option value="Promotion Video">Promotion Video</option>
-        </select>
-    </div>
-
-    <!-- Theme -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Theme</label>
-        <select id="theme" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm">
-            <option value="Sports">Sports ⚽️</option>
-            <option value="Casino">Casino 🎰</option>
-        </select>
-    </div>
-
-    <!-- Platform -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Platform</label>
-        <select id="platform" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm">
-            <option value="Instagram Reels">Instagram Reels</option>
-            <option value="TikTok">TikTok</option>
-            <option value="Facebook">Facebook</option>
-            <option value="YouTube">YouTube</option>
-            <option value="YouTube">Telegram</option>
-        </select>
-    </div>
-
-    <!-- Language -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Language</label>
-        <select id="language" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm">
-            <option value="Arabic">Arabic</option>
-            <option value="English">English</option>
-            <option value="French">French</option>
-        </select>
-    </div>
-
-    <!-- Desired Teams/Players -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Desired Teams/Players</label>
-        <input id="players" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm"
-               placeholder="Real Madrid / Ronaldo / Lamine Yamal etc." />
-    </div>
-
-    <!-- Promo Code -->
-    <div>
-        <label class="text-[11px] text-gray-300 uppercase font-bold">Promo Code</label>
-        <input id="promoCode" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm"
-               placeholder="Promo Code (if any)" />
-    </div>
-</div>
-
-            <div>
-                <label class="text-[11px] text-gray-300 uppercase font-bold">Extra Notes for Designer</label>
-                <textarea id="notes" rows="3" class="mt-1 w-full rounded-xl p-3 bg-[#0b1220] border border-white/5 text-sm" placeholder="Colors, fonts, do not use red, emphasis on odds, etc."></textarea>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <button id="previewBtn" type="button" class="py-3 rounded-2xl font-black uppercase text-sm glass">Preview</button>
-                <button id="submitBtn" type="submit" class="py-3 rounded-2xl font-black uppercase text-sm bg-[#0088cc]">Submit Request</button>
-                <button id="clearBtn" type="button" class="py-3 rounded-2xl font-black uppercase text-sm border border-white/6">Reset</button>
-            </div>
-        </form>
-
-        <div id="result" class="mt-6 hidden">
-            <h4 class="text-[11px] font-bold text-gray-300 uppercase">Preview & Post</h4>
-            <div id="mockup" class="mock mt-3 glass border border-white/5">
-                <div id="mockContent" class="w-full text-sm">
-                    <div id="mockHeadline" class="font-black text-lg">Your headline here</div>
-                    <div id="mockCTA" class="mt-2 font-bold text-[13px] uppercase">CTA</div>
-                    <div id="mockLink" class="mt-3 text-xs text-gray-400">https://...</div>
-                </div>
-            </div>
-
-            <div class="mt-4">
-                <label class="text-[11px] text-gray-300 uppercase font-bold">Post text (copy/share)</label>
-                <textarea id="postText" rows="4" class="mt-1 w-full rounded-xl p-3 bg-[#071022] border border-white/5 text-sm"></textarea>
-                <div class="flex gap-2 mt-3">
-                    <button id="copyPost" class="py-2 px-4 rounded-xl font-bold text-sm glass">Copy Post</button>
-                    <button id="shareTG" class="py-2 px-4 rounded-xl font-bold text-sm bg-[#2ea0ff]">Share to Telegram</button>
-                    <button id="downloadReq" class="py-2 px-4 rounded-xl font-bold text-sm border border-white/6">Download JSON</button>
-                </div>
-            </div>
+    
+    <nav class="navbar-glass p-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center space-x-3">
+            <img src="assets/logo.png" class="h-8 w-auto" alt="Logo" onerror="this.src='https://img.icons8.com/color/48/1xbet.png'">
+            <div class="text-lg font-black tracking-tight text-white">ZAYN1x <span class="text-[10px] text-blue-300 font-medium tracking-wide uppercase opacity-70">| Request Banner</span></div>
         </div>
+        <div id="userBadge" class="hidden flex items-center space-x-2 bg-blue-500/10 px-3 py-1 rounded-full border border-blue-500/20 tg-only">
+            <span id="topBarName" class="text-[11px] font-bold text-blue-300 uppercase tracking-tighter"></span>
+        </div>
+    </nav>
 
-        <p id="hint" class="text-[11px] text-gray-500 mt-4 italic">Tip: If you open this inside Telegram, the form will send directly to the bot. Otherwise it falls back to a webhook.</p>
-    </div>
-</main>
+    <section class="pt-8 pb-4 px-6 text-center z-10 relative">
+        <h1 class="animate__animated animate__fadeInDown text-2xl font-extrabold mb-2 text-white drop-shadow-lg">
+            Request Custom Banner
+        </h1>
+        <p class="text-[13px] text-[#8aa2cf] max-w-md mx-auto leading-relaxed">
+            Fill the form below to submit your request to the design queue.
+        </p>
+    </section>
 
-<!-- fallback start button (non-telegram) -->
-<script>
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    const isTelegram = !!tg;
-    const webhookURL = 'https://script.google.com/macros/s/AKfycbzSKZIoeE7dh1lmdx0ggmDQpFF3YrYKRll1Mdjl7D1gh0zuFXb5qh73MULXUYbY0XB1/exec'; // <-- replace with your server endpoint to receive POST requests
+    <main class="px-4 pb-36 max-w-3xl mx-auto mt-2">
+        <div class="card-style">
+            <h3 class="text-xs font-bold mb-6 text-blue-400 uppercase tracking-widest border-b border-white/5 pb-2">Banner Details</h3>
 
-    // init
-    if (isTelegram) {
-        try { tg.ready?.(); tg.expand?.(); tg.setHeaderColor?.('#0f172a'); } catch(e){ console.warn(e) }
-    } else {
-        document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
-    }
+            <form id="bannerForm" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-    // personalize
-    if (isTelegram && tg.initDataUnsafe?.user) {
-        const u = tg.initDataUnsafe.user;
-        document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
-        document.getElementById('userBadge').classList.remove('hidden');
-        const aff = document.getElementById('affiliate');
-        if (aff && u.username) aff.value = '@' + u.username;
-    }
+                    <div>
+                        <label for="affiliate">Affiliate</label>
+                        <input id="affiliate" name="affiliate" class="custom-input" placeholder="@username or Name" required />
+                    </div>
 
-    // UI refs
-    const form = document.getElementById('bannerForm');
-    const size = document.getElementById('size');
-    const customRow = document.getElementById('customSizeRow');
-    const customSize = document.getElementById('customSize');
-    const previewBtn = document.getElementById('previewBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const result = document.getElementById('result');
-    const mockHeadline = document.getElementById('mockHeadline');
-    const mockCTA = document.getElementById('mockCTA');
-    const mockLink = document.getElementById('mockLink');
-    const postText = document.getElementById('postText');
-    const copyPost = document.getElementById('copyPost');
-    const shareTG = document.getElementById('shareTG');
-    const previewWrap = document.getElementById('previewWrap');
-    const previewImg = document.getElementById('previewImg');
-    const fileInput = document.getElementById('file');
-    const downloadReq = document.getElementById('downloadReq');
+                    <div>
+                        <label for="type">Type</label>
+                        <select id="type" class="custom-input">
+                            <option value="Banner">Banner</option>
+                            <option value="Player Registration Video">Player Registration Video</option>
+                            <option value="Promotion Video">Promotion Video</option>
+                        </select>
+                    </div>
 
-    size.addEventListener('change', e => {
-        if (e.target.value === 'custom') customRow.classList.remove('hidden'); else customRow.classList.add('hidden');
-    });
+                    <div>
+                        <label for="theme">Theme</label>
+                        <select id="theme" class="custom-input">
+                            <option value="Sports">Sports ⚽️</option>
+                            <option value="Casino">Casino 🎰</option>
+                        </select>
+                    </div>
 
-    fileInput.addEventListener('change', e => {
-        const f = e.target.files?.[0];
-        if (!f) { previewWrap.classList.add('hidden'); previewImg.src = ''; return; }
-        const url = URL.createObjectURL(f);
-        previewImg.src = url; previewWrap.classList.remove('hidden');
-    });
+                    <div>
+                        <label for="platform">Platform</label>
+                        <select id="platform" class="custom-input">
+                            <option value="Instagram Reels">Instagram Reels</option>
+                            <option value="TikTok">TikTok</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="YouTube">YouTube</option>
+                            <option value="Telegram">Telegram</option>
+                        </select>
+                    </div>
 
-    function buildPayload() {
-    return {
-        type: 'banner_request',
-        time: new Date().toISOString(),
-        affiliate: document.getElementById('affiliate').value || '',
-        requestType: document.getElementById('type').value || '',
-        theme: document.getElementById('theme').value || '',
-        platform: document.getElementById('platform').value || '',
-        language: document.getElementById('language').value || '',
-        players: document.getElementById('players').value || '',
-        promoCode: document.getElementById('promoCode').value || '',
-        link: document.getElementById('link').value || '',
-        headline: document.getElementById('headline').value || '',
-        cta: document.getElementById('cta').value || '',
-        notes: document.getElementById('notes').value || '',
-        fileName: fileInput.files?.[0]?.name || ''
-    };
-}
+                    <div>
+                        <label for="language">Language</label>
+                        <select id="language" class="custom-input">
+                            <option value="Arabic">Arabic</option>
+                            <option value="English">English</option>
+                            <option value="French">French</option>
+                        </select>
+                    </div>
 
+                    <div>
+                        <label for="players">Desired Teams/Players</label>
+                        <input id="players" class="custom-input" placeholder="Real Madrid / Ronaldo..." />
+                    </div>
 
-    previewBtn.onclick = () => {
-        const p = buildPayload();
-        mockHeadline.innerText = p.headline || 'Your headline here';
-        mockCTA.innerText = p.cta || 'Play Now';
-        mockLink.innerText = p.link || 'https://your.aff.link';
-        postText.value = `${p.headline || ''}\n${p.cta ? p.cta + ' → ' : ''}${p.link}\n\nPosted by ${p.affiliate || 'ZAYN1x'}`.trim();
-        result.classList.remove('hidden');
-    };
+                    <div>
+                        <label for="promoCode">Promo Code</label>
+                        <input id="promoCode" class="custom-input" placeholder="Promo Code (if any)" />
+                    </div>
+                    
+                    <div class="hidden">
+                         <input id="link" value="" />
+                         <input id="headline" value="" />
+                         <input id="cta" value="" />
+                    </div>
+                </div>
+                
+                <div>
+                     <label for="file">Reference Image (Optional)</label>
+                     <input type="file" id="file" class="custom-input text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20"/>
+                </div>
 
-    copyPost.onclick = async () => {
-        try { await navigator.clipboard.writeText(postText.value); copyPost.innerText = 'Copied!'; setTimeout(()=>copyPost.innerText='Copy Post',1400); }
-        catch(e){ alert('Copy failed — please copy manually.'); }
-    };
+                <div>
+                    <label for="notes">Extra Notes for Designer</label>
+                    <textarea id="notes" rows="3" class="custom-input" placeholder="Colors, fonts, do not use red, emphasis on odds, etc."></textarea>
+                </div>
 
-    shareTG.onclick = () => {
-        const text = encodeURIComponent(postText.value);
-        const url = encodeURIComponent(document.getElementById('link').value || 'https://t.me/zayn1xaffiliates');
-        const share = `https://t.me/share/url?url=${url}&text=${text}`;
-        if (isTelegram && typeof tg.openLink === 'function') {
-            try { tg.openLink(share); return; } catch(e) { /* fallback */ }
-        }
-        window.open(share, '_blank', 'noopener,noreferrer');
-    };
+                <div class="grid grid-cols-2 gap-3 pt-4">
+                    <button id="clearBtn" type="button" class="btn-primary btn-secondary py-3 rounded-2xl font-black uppercase text-sm !bg-transparent !border-white/20">Reset</button>
+                    <button id="submitBtn" type="submit" class="btn-primary py-3 rounded-2xl font-black uppercase text-sm">Submit Request</button>
+                </div>
+            </form>
 
-    downloadReq.onclick = () => {
-        const p = buildPayload();
-        const blob = new Blob([JSON.stringify(p, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = 'banner-request.json'; a.click(); URL.revokeObjectURL(url);
-    };
+            <p id="hint" class="text-[10px] text-center text-gray-500 mt-6 italic opacity-60">
+                Request will be logged in the system.
+            </p>
+        </div>
+    </main>
 
-    clearBtn.onclick = () => { form.reset(); previewWrap.classList.add('hidden'); result.classList.add('hidden'); }
+    <script>
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        const isTelegram = !!tg;
+        
+        // YOUR GOOGLE SCRIPT URL
+        const webhookURL = 'https://script.google.com/macros/s/AKfycbzSKZIoeE7dh1lmdx0ggmDQpFF3YrYKRll1Mdjl7D1gh0zuFXb5qh73MULXUYbY0XB1/exec'; 
 
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        submitBtn.disabled = true; submitBtn.innerText = 'Sending...';
-
-        const payload = buildPayload();
-
-        // try to include small image as base64 if file present and < 1MB
-        if (fileInput.files?.[0]) {
-            const f = fileInput.files[0];
-            if (f.size < 1024*1024) {
-                payload.fileBase64 = await toBase64(f);
-            } else {
-                payload.fileNote = 'File too large for inline; will be available separately.';
-            }
+        // Init Telegram
+        if (isTelegram) {
+            try { 
+                tg.ready?.(); 
+                tg.expand?.(); 
+                tg.setHeaderColor?.('#041025'); 
+                tg.setBackgroundColor?.('#041025');
+            } catch(e){ console.warn(e) }
+        } else {
+            document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
         }
 
-        // If inside Telegram WebApp, use tg.sendData to deliver to bot (Bot gets web_app_data)
-        try {
-            if (isTelegram && typeof tg.sendData === 'function') {
-                tg.sendData(JSON.stringify(payload));
-                showToast('Request sent to bot — designer will reply in channel.');
-                submitBtn.innerText = 'Sent';
-                setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 1200);
-                return;
-            }
-        } catch (err) { console.warn('tg.sendData failed', err); }
+        // Personalize if in Telegram
+        if (isTelegram && tg.initDataUnsafe?.user) {
+            const u = tg.initDataUnsafe.user;
+            document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
+            document.getElementById('userBadge').classList.remove('hidden');
+            const aff = document.getElementById('affiliate');
+            if (aff && u.username) aff.value = '@' + u.username;
+        }
 
-        // Fallback: POST to webhook
-        try {
-            const r = await fetch(webhookURL, { method:'POST', headers:{'content-type':'application/json'}, body: JSON.stringify(payload) });
-            if (r.ok) {
-                showToast('Request submitted to webhook.');
+        // UI refs
+        const form = document.getElementById('bannerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileInput = document.getElementById('file');
+
+        function buildPayload() {
+            return {
+                type: 'banner_request',
+                time: new Date().toISOString(),
+                affiliate: document.getElementById('affiliate')?.value || '',
+                requestType: document.getElementById('type')?.value || '',
+                theme: document.getElementById('theme')?.value || '',
+                platform: document.getElementById('platform')?.value || '',
+                language: document.getElementById('language')?.value || '',
+                players: document.getElementById('players')?.value || '',
+                promoCode: document.getElementById('promoCode')?.value || '',
+                notes: document.getElementById('notes')?.value || '',
+                fileName: fileInput.files?.[0]?.name || ''
+            };
+        }
+
+        // Reset Logic
+        clearBtn.onclick = () => { 
+            form.reset(); 
+        }
+
+        // Submit Logic
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            submitBtn.disabled = true; 
+            submitBtn.innerText = 'Sending...';
+
+            const payload = buildPayload();
+
+            // Handle File (Optional base64 for small files)
+            if (fileInput.files?.[0]) {
+                const f = fileInput.files[0];
+                if (f.size < 1024*1024) {
+                    payload.fileBase64 = await toBase64(f);
+                } else {
+                    payload.fileNote = 'File too large for inline; check separate upload.';
+                }
+            }
+
+            // 1. Try Telegram Data Send (Bot Interaction)
+            try {
+                if (isTelegram && typeof tg.sendData === 'function') {
+                    tg.sendData(JSON.stringify(payload));
+                    // If sendData works, the web app usually closes, but if not:
+                    showToast('Request sent via Telegram Bot');
+                    submitBtn.innerText = 'Sent';
+                    setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 1200);
+                    return;
+                }
+            } catch (err) { console.warn('tg.sendData failed', err); }
+
+            // 2. Google Sheet Webhook POST
+            try {
+                // Using no-cors mode ensures the request is sent even if the script doesn't return perfect headers
+                const r = await fetch(webhookURL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    headers: {'content-type': 'application/json'}, 
+                    body: JSON.stringify(payload) 
+                });
+                
+                // With no-cors we can't check r.ok, so we assume success if no error thrown
+                showToast('Request submitted successfully!');
                 submitBtn.innerText='Sent';
-            } else {
-                showToast('Webhook error: ' + r.status);
-                submitBtn.innerText='Error';
+                form.reset();
+                
+            } catch (err) {
+                console.error(err);
+                showToast('Network error. Check console.');
+                submitBtn.innerText='Failed';
             }
-        } catch (err) {
-            console.error(err);
-            showToast('Network error while sending. See console.');
-            submitBtn.innerText='Failed';
-        }
-        setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 1600);
-    });
-
-    function showToast(msg) {
-        const t = document.createElement('div');
-        t.innerText = msg; t.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-white/10 text-white py-2 px-4 rounded-xl shadow-lg';
-        document.body.appendChild(t);
-        setTimeout(()=>{ t.style.opacity=0; setTimeout(()=>t.remove(),300); }, 2200);
-    }
-
-    function toBase64(file) {
-        return new Promise((res, rej) => {
-            const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
+            
+            setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
         });
-    }
 
-    // Accessibility: allow pressing Enter on form (already handled by submit)
-</script>
+        function showToast(msg) {
+            const t = document.createElement('div');
+            t.innerText = msg; 
+            t.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-xl shadow-2xl z-50 text-sm font-bold animate__animated animate__fadeInUp';
+            document.body.appendChild(t);
+            setTimeout(()=>{ 
+                t.classList.remove('animate__fadeInUp');
+                t.classList.add('animate__fadeOutDown');
+                setTimeout(()=>t.remove(), 500); 
+            }, 2500);
+        }
+
+        function toBase64(file) {
+            return new Promise((res, rej) => {
+                const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
+            });
+        }
+    </script>
 
 </body>
 </html>
