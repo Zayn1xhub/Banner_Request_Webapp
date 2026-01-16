@@ -257,8 +257,8 @@
         const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
         const isTelegram = !!tg;
         
-        // YOUR GOOGLE SCRIPT URL
-        const webhookURL = 'https://script.google.com/macros/s/AKfycbwovyN6kClT0wmewowYiD_Gbgy_HUX39QR8pyJnTBYBZm6nvoDNy2nBhJ3mwTq5Q_FJKQ/exec'; 
+        // YOUR GOOGLE SCRIPT URL (Make sure this is your deployment URL)
+        const webhookURL = 'YOUR_GOOGLE_SCRIPT_URL_HERE'; 
 
         // Init Telegram
         if (isTelegram) {
@@ -326,37 +326,37 @@
                 }
             }
 
-            // 1. Try Telegram Data Send (Bot Interaction)
+            // --- STEP 1: SEND TO GOOGLE SHEET (Primary Goal) ---
+            let sheetSuccess = false;
             try {
-                if (isTelegram && typeof tg.sendData === 'function') {
-                    tg.sendData(JSON.stringify(payload));
-                    // If sendData works, the web app usually closes, but if not:
-                    showToast('Request sent via Telegram Bot');
-                    submitBtn.innerText = 'Sent';
-                    setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 1200);
-                    return;
-                }
-            } catch (err) { console.warn('tg.sendData failed', err); }
-
-            // 2. Google Sheet Webhook POST
-            try {
-                // Using no-cors mode ensures the request is sent even if the script doesn't return perfect headers
-                const r = await fetch(webhookURL, { 
+                // Using no-cors mode ensures the request sends even with generic headers
+                await fetch(webhookURL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
                     headers: {'content-type': 'application/json'}, 
                     body: JSON.stringify(payload) 
                 });
-                
-                // With no-cors we can't check r.ok, so we assume success if no error thrown
-                showToast('Request submitted successfully!');
-                submitBtn.innerText='Sent';
-                form.reset();
-                
+                sheetSuccess = true;
             } catch (err) {
-                console.error(err);
-                showToast('Network error. Check console.');
-                submitBtn.innerText='Failed';
+                console.error("Sheet Error:", err);
+                showToast('Error sending to Sheet. Check internet.');
+            }
+
+            // --- STEP 2: HANDLE TELEGRAM FEEDBACK ---
+            if (sheetSuccess) {
+                showToast('Request submitted successfully!');
+                submitBtn.innerText = 'Sent';
+                form.reset();
+
+                // Optional: If inside Telegram, we can close the app or send data to bot AFTER sheet is done
+                if (isTelegram && typeof tg.sendData === 'function') {
+                    // Slight delay so user sees the "Success" toast before closing
+                    setTimeout(() => {
+                        tg.sendData(JSON.stringify({ status: "success", text: "Request Logged in Sheet" }));
+                    }, 1500);
+                }
+            } else {
+                submitBtn.innerText = 'Failed';
             }
             
             setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
