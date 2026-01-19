@@ -68,7 +68,7 @@
             transition: all 0.2s ease;
         }
 
-        /* SELECT SPECIFIC STYLING - Fix for dark mode dropdowns */
+        /* SELECT SPECIFIC STYLING */
         select.custom-input {
             appearance: none;
             background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
@@ -78,7 +78,6 @@
             padding-right: 2.5rem;
         }
         
-        /* This ensures the dropdown options are dark blue with white text */
         select option {
             background-color: var(--bg-1);
             color: white;
@@ -254,150 +253,133 @@
     </main>
 
     <script>
-       <script>
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-    const isTelegram = !!tg;
-    
-    // REPLACE THIS WITH YOUR NEW "V2" DEPLOYMENT URL
-    const webhookURL = 'https://script.google.com/macros/s/AKfycbwovyN6kClT0wmewowYiD_Gbgy_HUX39QR8pyJnTBYBZm6nvoDNy2nBhJ3mwTq5Q_FJKQ/exec'; 
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+        const isTelegram = !!tg;
+        
+        // Use your URL
+        const webhookURL = 'https://script.google.com/macros/s/AKfycbwovyN6kClT0wmewowYiD_Gbgy_HUX39QR8pyJnTBYBZm6nvoDNy2nBhJ3mwTq5Q_FJKQ/exec';
 
-    // Init Telegram
-    if (isTelegram) {
-        try { 
-            tg.ready?.(); 
-            tg.expand?.(); 
-            tg.setHeaderColor?.('#041025'); 
-            tg.setBackgroundColor?.('#041025');
-        } catch(e){ console.warn(e) }
-    } else {
-        document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
-    }
-
-    // Personalize
-    if (isTelegram && tg.initDataUnsafe?.user) {
-        const u = tg.initDataUnsafe.user;
-        document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
-        document.getElementById('userBadge').classList.remove('hidden');
-        const aff = document.getElementById('affiliate');
-        if (aff && u.username) aff.value = '@' + u.username;
-    }
-
-    // UI refs
-    const form = document.getElementById('bannerForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const clearBtn = document.getElementById('clearBtn');
-    const fileInput = document.getElementById('file');
-
-    function buildPayload() {
-        return {
-            type: 'banner_request',
-            time: new Date().toISOString(),
-            affiliate: document.getElementById('affiliate')?.value || '',
-            requestType: document.getElementById('type')?.value || '',
-            theme: document.getElementById('theme')?.value || '',
-            platform: document.getElementById('platform')?.value || '',
-            language: document.getElementById('language')?.value || '',
-            players: document.getElementById('players')?.value || '',
-            promoCode: document.getElementById('promoCode')?.value || '',
-            notes: document.getElementById('notes')?.value || '',
-            fileName: fileInput.files?.[0]?.name || ''
-        };
-    }
-
-    clearBtn.onclick = () => { form.reset(); }
-
-    form.addEventListener('submit', async e => {
-        e.preventDefault();
-        submitBtn.disabled = true; 
-        submitBtn.innerText = 'Sending...';
-
-        const payload = buildPayload();
-
-        // Handle File
-        if (fileInput.files?.[0]) {
-            const f = fileInput.files[0];
-            if (f.size < 1024*1024) {
-                payload.fileBase64 = await toBase64(f);
-            } else {
-                payload.fileNote = 'File too large for inline; check separate upload.';
-            }
+        // Init Telegram
+        if (isTelegram) {
+            try { 
+                tg.ready?.(); 
+                tg.expand?.(); 
+                tg.setHeaderColor?.('#041025'); 
+                tg.setBackgroundColor?.('#041025');
+            } catch(e){ console.warn(e) }
+        } else {
+            document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
         }
 
-        // --- SEND DATA ---
-        try {
-            // We use standard fetch to detect errors (403, 404, etc.)
-            const response = await fetch(webhookURL, { 
-                method: 'POST', 
-                body: JSON.stringify(payload)
-                // Note: We are not explicitly setting headers to avoid some CORS pre-flight triggers
-                // Google Apps Script handles plain text bodies well.
-            });
+        // Personalize
+        if (isTelegram && tg.initDataUnsafe?.user) {
+            const u = tg.initDataUnsafe.user;
+            document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
+            document.getElementById('userBadge').classList.remove('hidden');
+            const aff = document.getElementById('affiliate');
+            if (aff && u.username) aff.value = '@' + u.username;
+        }
 
-            // If we get here without error, check status if possible
-            if (response.ok || response.status === 200 || response.type === 'opaque') {
-                handleSuccess();
-            } else {
-                throw new Error('Server responded with ' + response.status);
+        // UI refs
+        const form = document.getElementById('bannerForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const fileInput = document.getElementById('file');
+
+        function buildPayload() {
+            return {
+                type: 'banner_request',
+                time: new Date().toISOString(),
+                affiliate: document.getElementById('affiliate')?.value || '',
+                requestType: document.getElementById('type')?.value || '',
+                theme: document.getElementById('theme')?.value || '',
+                platform: document.getElementById('platform')?.value || '',
+                language: document.getElementById('language')?.value || '',
+                players: document.getElementById('players')?.value || '',
+                promoCode: document.getElementById('promoCode')?.value || '',
+                notes: document.getElementById('notes')?.value || '',
+                fileName: fileInput.files?.[0]?.name || ''
+            };
+        }
+
+        clearBtn.onclick = () => { form.reset(); }
+
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+            submitBtn.disabled = true; 
+            submitBtn.innerText = 'Sending...';
+
+            const payload = buildPayload();
+
+            // Handle File
+            if (fileInput.files?.[0]) {
+                const f = fileInput.files[0];
+                if (f.size < 1024*1024) {
+                    payload.fileBase64 = await toBase64(f);
+                } else {
+                    payload.fileNote = 'File too large for inline; check separate upload.';
+                }
             }
 
-        } catch (err) {
-            // Fallback: Sometimes Google returns a "302 Redirect" which browsers block as a CORS error, 
-            // even though the data was actually sent successfully. 
-            // We can retry with no-cors to be sure, or just show error.
-            console.warn("Fetch warning:", err);
-            
-            // If the error is 403 specifically, we know it failed.
-            if (err.message.includes('403')) {
-                handleFailure('Permission Denied. Check Server Deployment.');
-            } else {
-                // For other errors (like the redirect CORS issue), we assume success to not scare the user,
-                // OR we can try the 'no-cors' fallback if you prefer.
-                // Let's show a generic failure for now so you can debug.
+            // --- SEND DATA ---
+            try {
+                // IMPORTANT: mode: 'no-cors' is required to avoid Google 302/403 blocks in the browser
+                // With 'no-cors', we cannot read the response content, but the data IS sent.
+                await fetch(webhookURL, { 
+                    method: 'POST', 
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload) 
+                });
+
+                // If no error was thrown, we assume success
+                handleSuccess();
+
+            } catch (err) {
+                console.warn("Fetch Error:", err);
                 handleFailure('Submission Failed. Please try again.');
             }
-        }
-    });
-
-    function handleSuccess() {
-        showToast('✅ Request submitted successfully!', 'bg-green-600');
-        submitBtn.innerText = 'Sent';
-        form.reset();
-        
-        // Telegram feedback
-        if (isTelegram && typeof tg.sendData === 'function') {
-            setTimeout(() => {
-                tg.sendData(JSON.stringify({ status: "success" }));
-            }, 1500);
-        }
-        
-        setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
-    }
-
-    function handleFailure(msg) {
-        showToast('❌ ' + msg, 'bg-red-600');
-        submitBtn.innerText = 'Failed';
-        setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
-    }
-
-    function showToast(msg, colorClass) {
-        const t = document.createElement('div');
-        t.innerText = msg; 
-        // Using Tailwind classes for color
-        t.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 ${colorClass} text-white py-3 px-6 rounded-xl shadow-2xl z-50 text-sm font-bold animate__animated animate__fadeInUp`;
-        document.body.appendChild(t);
-        setTimeout(()=>{ 
-            t.classList.remove('animate__fadeInUp');
-            t.classList.add('animate__fadeOutDown');
-            setTimeout(()=>t.remove(), 500); 
-        }, 3000);
-    }
-
-    function toBase64(file) {
-        return new Promise((res, rej) => {
-            const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
         });
-    }
-</script>
+
+        function handleSuccess() {
+            showToast('✅ Request submitted successfully!', 'bg-green-600');
+            submitBtn.innerText = 'Sent';
+            form.reset();
+            
+            // Telegram feedback
+            if (isTelegram && typeof tg.sendData === 'function') {
+                setTimeout(() => {
+                    tg.sendData(JSON.stringify({ status: "success" }));
+                }, 1500);
+            }
+            
+            setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
+        }
+
+        function handleFailure(msg) {
+            showToast('❌ ' + msg, 'bg-red-600');
+            submitBtn.innerText = 'Failed';
+            setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
+        }
+
+        function showToast(msg, colorClass) {
+            const t = document.createElement('div');
+            t.innerText = msg; 
+            t.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 ${colorClass} text-white py-3 px-6 rounded-xl shadow-2xl z-50 text-sm font-bold animate__animated animate__fadeInUp`;
+            document.body.appendChild(t);
+            setTimeout(()=>{ 
+                t.classList.remove('animate__fadeInUp');
+                t.classList.add('animate__fadeOutDown');
+                setTimeout(()=>t.remove(), 500); 
+            }, 3000);
+        }
+
+        function toBase64(file) {
+            return new Promise((res, rej) => {
+                const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
+            });
+        }
+    </script>
 
 </body>
 </html>
