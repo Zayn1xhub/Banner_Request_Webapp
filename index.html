@@ -254,132 +254,150 @@
     </main>
 
     <script>
-        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
-        const isTelegram = !!tg;
-        
-        // YOUR GOOGLE SCRIPT URL (Make sure this is your deployment URL)
-        const webhookURL = 'https://script.google.com/macros/s/AKfycbwovyN6kClT0wmewowYiD_Gbgy_HUX39QR8pyJnTBYBZm6nvoDNy2nBhJ3mwTq5Q_FJKQ/exec'; 
+       <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    const isTelegram = !!tg;
+    
+    // REPLACE THIS WITH YOUR NEW "V2" DEPLOYMENT URL
+    const webhookURL = 'https://script.google.com/macros/s/AKfycbwovyN6kClT0wmewowYiD_Gbgy_HUX39QR8pyJnTBYBZm6nvoDNy2nBhJ3mwTq5Q_FJKQ/exec'; 
 
-        // Init Telegram
-        if (isTelegram) {
-            try { 
-                tg.ready?.(); 
-                tg.expand?.(); 
-                tg.setHeaderColor?.('#041025'); 
-                tg.setBackgroundColor?.('#041025');
-            } catch(e){ console.warn(e) }
-        } else {
-            document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
-        }
+    // Init Telegram
+    if (isTelegram) {
+        try { 
+            tg.ready?.(); 
+            tg.expand?.(); 
+            tg.setHeaderColor?.('#041025'); 
+            tg.setBackgroundColor?.('#041025');
+        } catch(e){ console.warn(e) }
+    } else {
+        document.querySelectorAll('.tg-only').forEach(n => n.classList.add('hidden'));
+    }
 
-        // Personalize if in Telegram
-        if (isTelegram && tg.initDataUnsafe?.user) {
-            const u = tg.initDataUnsafe.user;
-            document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
-            document.getElementById('userBadge').classList.remove('hidden');
-            const aff = document.getElementById('affiliate');
-            if (aff && u.username) aff.value = '@' + u.username;
-        }
+    // Personalize
+    if (isTelegram && tg.initDataUnsafe?.user) {
+        const u = tg.initDataUnsafe.user;
+        document.getElementById('topBarName').innerText = (u.first_name || '') + (u.username ? ' @'+u.username : '');
+        document.getElementById('userBadge').classList.remove('hidden');
+        const aff = document.getElementById('affiliate');
+        if (aff && u.username) aff.value = '@' + u.username;
+    }
 
-        // UI refs
-        const form = document.getElementById('bannerForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const fileInput = document.getElementById('file');
+    // UI refs
+    const form = document.getElementById('bannerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const fileInput = document.getElementById('file');
 
-        function buildPayload() {
-            return {
-                type: 'banner_request',
-                time: new Date().toISOString(),
-                affiliate: document.getElementById('affiliate')?.value || '',
-                requestType: document.getElementById('type')?.value || '',
-                theme: document.getElementById('theme')?.value || '',
-                platform: document.getElementById('platform')?.value || '',
-                language: document.getElementById('language')?.value || '',
-                players: document.getElementById('players')?.value || '',
-                promoCode: document.getElementById('promoCode')?.value || '',
-                notes: document.getElementById('notes')?.value || '',
-                fileName: fileInput.files?.[0]?.name || ''
-            };
-        }
+    function buildPayload() {
+        return {
+            type: 'banner_request',
+            time: new Date().toISOString(),
+            affiliate: document.getElementById('affiliate')?.value || '',
+            requestType: document.getElementById('type')?.value || '',
+            theme: document.getElementById('theme')?.value || '',
+            platform: document.getElementById('platform')?.value || '',
+            language: document.getElementById('language')?.value || '',
+            players: document.getElementById('players')?.value || '',
+            promoCode: document.getElementById('promoCode')?.value || '',
+            notes: document.getElementById('notes')?.value || '',
+            fileName: fileInput.files?.[0]?.name || ''
+        };
+    }
 
-        // Reset Logic
-        clearBtn.onclick = () => { 
-            form.reset(); 
-        }
+    clearBtn.onclick = () => { form.reset(); }
 
-        // Submit Logic
-        form.addEventListener('submit', async e => {
-            e.preventDefault();
-            submitBtn.disabled = true; 
-            submitBtn.innerText = 'Sending...';
+    form.addEventListener('submit', async e => {
+        e.preventDefault();
+        submitBtn.disabled = true; 
+        submitBtn.innerText = 'Sending...';
 
-            const payload = buildPayload();
+        const payload = buildPayload();
 
-            // Handle File (Optional base64 for small files)
-            if (fileInput.files?.[0]) {
-                const f = fileInput.files[0];
-                if (f.size < 1024*1024) {
-                    payload.fileBase64 = await toBase64(f);
-                } else {
-                    payload.fileNote = 'File too large for inline; check separate upload.';
-                }
-            }
-
-            // --- STEP 1: SEND TO GOOGLE SHEET (Primary Goal) ---
-            let sheetSuccess = false;
-            try {
-                // Using no-cors mode ensures the request sends even with generic headers
-                await fetch(webhookURL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    headers: {'content-type': 'application/json'}, 
-                    body: JSON.stringify(payload) 
-                });
-                sheetSuccess = true;
-            } catch (err) {
-                console.error("Sheet Error:", err);
-                showToast('Error sending to Sheet. Check internet.');
-            }
-
-            // --- STEP 2: HANDLE TELEGRAM FEEDBACK ---
-            if (sheetSuccess) {
-                showToast('Request submitted successfully!');
-                submitBtn.innerText = 'Sent';
-                form.reset();
-
-                // Optional: If inside Telegram, we can close the app or send data to bot AFTER sheet is done
-                if (isTelegram && typeof tg.sendData === 'function') {
-                    // Slight delay so user sees the "Success" toast before closing
-                    setTimeout(() => {
-                        tg.sendData(JSON.stringify({ status: "success", text: "Request Logged in Sheet" }));
-                    }, 1500);
-                }
+        // Handle File
+        if (fileInput.files?.[0]) {
+            const f = fileInput.files[0];
+            if (f.size < 1024*1024) {
+                payload.fileBase64 = await toBase64(f);
             } else {
-                submitBtn.innerText = 'Failed';
+                payload.fileNote = 'File too large for inline; check separate upload.';
             }
-            
-            setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
-        });
-
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.innerText = msg; 
-            t.className = 'fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-xl shadow-2xl z-50 text-sm font-bold animate__animated animate__fadeInUp';
-            document.body.appendChild(t);
-            setTimeout(()=>{ 
-                t.classList.remove('animate__fadeInUp');
-                t.classList.add('animate__fadeOutDown');
-                setTimeout(()=>t.remove(), 500); 
-            }, 2500);
         }
 
-        function toBase64(file) {
-            return new Promise((res, rej) => {
-                const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
+        // --- SEND DATA ---
+        try {
+            // We use standard fetch to detect errors (403, 404, etc.)
+            const response = await fetch(webhookURL, { 
+                method: 'POST', 
+                body: JSON.stringify(payload)
+                // Note: We are not explicitly setting headers to avoid some CORS pre-flight triggers
+                // Google Apps Script handles plain text bodies well.
             });
+
+            // If we get here without error, check status if possible
+            if (response.ok || response.status === 200 || response.type === 'opaque') {
+                handleSuccess();
+            } else {
+                throw new Error('Server responded with ' + response.status);
+            }
+
+        } catch (err) {
+            // Fallback: Sometimes Google returns a "302 Redirect" which browsers block as a CORS error, 
+            // even though the data was actually sent successfully. 
+            // We can retry with no-cors to be sure, or just show error.
+            console.warn("Fetch warning:", err);
+            
+            // If the error is 403 specifically, we know it failed.
+            if (err.message.includes('403')) {
+                handleFailure('Permission Denied. Check Server Deployment.');
+            } else {
+                // For other errors (like the redirect CORS issue), we assume success to not scare the user,
+                // OR we can try the 'no-cors' fallback if you prefer.
+                // Let's show a generic failure for now so you can debug.
+                handleFailure('Submission Failed. Please try again.');
+            }
         }
-    </script>
+    });
+
+    function handleSuccess() {
+        showToast('✅ Request submitted successfully!', 'bg-green-600');
+        submitBtn.innerText = 'Sent';
+        form.reset();
+        
+        // Telegram feedback
+        if (isTelegram && typeof tg.sendData === 'function') {
+            setTimeout(() => {
+                tg.sendData(JSON.stringify({ status: "success" }));
+            }, 1500);
+        }
+        
+        setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
+    }
+
+    function handleFailure(msg) {
+        showToast('❌ ' + msg, 'bg-red-600');
+        submitBtn.innerText = 'Failed';
+        setTimeout(()=>{ submitBtn.disabled=false; submitBtn.innerText='Submit Request'; }, 2000);
+    }
+
+    function showToast(msg, colorClass) {
+        const t = document.createElement('div');
+        t.innerText = msg; 
+        // Using Tailwind classes for color
+        t.className = `fixed bottom-6 left-1/2 transform -translate-x-1/2 ${colorClass} text-white py-3 px-6 rounded-xl shadow-2xl z-50 text-sm font-bold animate__animated animate__fadeInUp`;
+        document.body.appendChild(t);
+        setTimeout(()=>{ 
+            t.classList.remove('animate__fadeInUp');
+            t.classList.add('animate__fadeOutDown');
+            setTimeout(()=>t.remove(), 500); 
+        }, 3000);
+    }
+
+    function toBase64(file) {
+        return new Promise((res, rej) => {
+            const reader = new FileReader(); reader.onload = () => res(reader.result.split(',')[1]); reader.onerror = rej; reader.readAsDataURL(file);
+        });
+    }
+</script>
 
 </body>
 </html>
