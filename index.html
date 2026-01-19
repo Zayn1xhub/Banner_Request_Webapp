@@ -3,106 +3,76 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAYN1x — Request Creative</title>
+<title>ZAYN1x — Banner Request</title>
 <style>
-  /* [STYLES ARE IDENTICAL TO ABOVE TO ENSURE SAME VIBE] */
-  :root { --brand: #2b65ff; --bg-1: #041025; --bg-2: #020a18; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.08); --text-muted: rgba(230, 238, 248, 0.7); }
-  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-1); color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  /* [CSS STYLES ARE MATCHED TO INDEX.HTML FOR CONTINUITY] */
+  :root { --brand: #2b65ff; --bg-1: #041025; --bg-2: #020a18; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); --text-muted: rgba(230, 238, 248, 0.6); }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-1); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-x: hidden; }
   
-  .bg-elements { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, var(--bg-1), var(--bg-2)); }
-  .floating-logo { position: absolute; color: rgba(255,255,255,0.03); font-weight: 900; font-size: 120px; user-select: none; pointer-events: none; animation: float 20s infinite linear; }
-  @keyframes float { 0% { transform: translateY(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; } }
+  .bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, var(--bg-1), var(--bg-2)); overflow: hidden; }
+  .floating-char { position: absolute; color: rgba(255,255,255,0.04); font-weight: 900; user-select: none; pointer-events: none; animation: floatUp linear infinite; }
+  @keyframes floatUp { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
 
-  .card { width: 90%; max-width: 500px; padding: 40px; border-radius: 28px; background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(20px); box-shadow: 0 40px 100px rgba(0,0,0,0.5); }
+  .card { width: 100%; max-width: 520px; padding: 40px; border-radius: 28px; background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(25px); box-shadow: 0 40px 100px rgba(0,0,0,0.6); }
   .badge { display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(74, 222, 128, 0.1); color: #4ade80; font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 16px; border: 1px solid rgba(74, 222, 128, 0.3); }
-  h1 { font-size: 28px; margin: 0 0 10px; font-weight: 800; }
+  h1 { font-size: 28px; margin: 0 0 8px; font-weight: 800; }
   
-  .field { margin-bottom: 18px; }
-  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-  input, select, textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: #fff; font-size: 14px; outline: none; box-sizing: border-box; }
+  label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--brand); text-transform: uppercase; }
+  input, select, textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-size: 14px; outline: none; margin-bottom: 15px; box-sizing: border-box; }
   
-  /* Upload Zone */
-  .upload-zone {
-    border: 2px dashed var(--border); padding: 20px; text-align: center; border-radius: 12px;
-    cursor: pointer; transition: 0.3s; background: rgba(255,255,255,0.01);
-  }
-  .upload-zone:hover { border-color: var(--brand); background: rgba(43, 101, 255, 0.05); }
-  
-  .btn { width: 100%; padding: 16px; border-radius: 14px; border: 0; background: var(--brand); color: #fff; font-weight: 700; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+  .btn { width: 100%; padding: 16px; border-radius: 14px; border: 0; background: var(--brand); color: #fff; font-weight: 800; cursor: pointer; transition: 0.3s; }
 </style>
 </head>
 <body>
-  <div class="bg-elements" id="bg"></div>
 
-  <div class="card" id="card">
-    <div class="badge">PARTNER RESOURCES</div>
-    <h1>Custom Banner Request</h1>
-    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Need a high-converting banner? Give me the details and my design team will handle the rest.</p>
+  <div class="bg-canvas" id="bgEngine"></div>
 
-    <form id="requestForm">
-      <div class="field">
-        <label>Your Promo Code</label>
-        <input type="text" placeholder="e.g., ZAYN1x" required>
-      </div>
+  <div class="card">
+    <div class="badge">BANNER REQUEST</div>
+    <h1>Custom Creative</h1>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Provide your account details and requirements for a personalized 1XBET banner.</p>
 
-      <div class="field">
-        <label>Account Verification (Screenshot)</label>
-        <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
-          <span id="fileName" style="font-size:13px; color:var(--text-muted);">Click to upload account screenshot</span>
-          <input type="file" id="fileInput" hidden accept="image/*">
-        </div>
-      </div>
+    <form onsubmit="event.preventDefault(); alert('Request sent to the design team.');">
+      <label>Promo Code</label>
+      <input type="text" placeholder="e.g. ZAYN1x" required>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-        <div class="field">
-          <label>Type</label>
-          <select>
-            <option>Animated GIF</option>
-            <option>Static Image</option>
-            <option>Short Video/Reel</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Size</label>
-          <select>
-            <option>1080x1080 (Square)</option>
-            <option>1080x1920 (Story)</option>
-            <option>728x90 (Leaderboard)</option>
-          </select>
-        </div>
-      </div>
+      <label>Account ID</label>
+      <input type="text" placeholder="Your affiliate ID" required>
 
-      <div class="field">
-        <label>Specific Instructions</label>
-        <textarea rows="2" placeholder="Text, languages, or specific athletes..."></textarea>
-      </div>
+      <label>Banner Dimensions</label>
+      <select required>
+        <option value="">Choose size...</option>
+        <option>1080x1080 (Instagram/FB Square)</option>
+        <option>1080x1920 (TikTok/Stories)</option>
+        <option>728x90 (Leaderboard)</option>
+        <option>300x250 (Sidebar)</option>
+      </select>
 
-      <button type="submit" class="btn">Send Request</button>
+      <label>Content / Main Text</label>
+      <textarea rows="2" placeholder="What should the banner say? (e.g. 200% Bonus)"></textarea>
+
+      <label>Reference Image (Upload)</label>
+      <input type="file" style="border: 2px dashed var(--border); background: none; padding: 20px;">
+
+      <button type="submit" class="btn">Request Banner</button>
     </form>
   </div>
 
   <script>
-    // BG LOGOS
-    const bg = document.getElementById('bg');
-    const icons = ['1', 'X', '1', 'B', 'E', 'T'];
-    for(let i=0; i<15; i++) {
-      const div = document.createElement('div');
-      div.className = 'floating-logo';
-      div.innerText = icons[Math.floor(Math.random()*icons.length)];
-      div.style.left = Math.random() * 100 + 'vw';
-      div.style.animationDelay = Math.random() * 20 + 's';
-      bg.appendChild(div);
+    const engine = document.getElementById('bgEngine');
+    const chars = ['1', 'X', 'B', 'E', 'T'];
+    function createChar() {
+      const el = document.createElement('div');
+      el.className = 'floating-char';
+      el.innerText = chars[Math.floor(Math.random() * chars.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (Math.random() * 60 + 30) + 'px';
+      el.style.animationDuration = (Math.random() * 12 + 8) + 's';
+      engine.appendChild(el);
+      setTimeout(() => el.remove(), 20000);
     }
-
-    // File selection display
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-      if(this.files[0]) document.getElementById('fileName').innerText = "Selected: " + this.files[0].name;
-    });
-
-    document.getElementById('requestForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      alert("Request Sent! My designers will have it ready in 24-48 hours.");
-    });
+    for(let i=0; i<12; i++) createChar();
+    setInterval(createChar, 2000);
   </script>
 </body>
 </html>
