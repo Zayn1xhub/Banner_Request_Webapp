@@ -2,77 +2,82 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>ZAYN1x — Banner Request</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>ZAYN1x — Request Creative</title>
 <style>
-  /* [CSS STYLES ARE MATCHED TO INDEX.HTML FOR CONTINUITY] */
-  :root { --brand: #2b65ff; --bg-1: #041025; --bg-2: #020a18; --glass: rgba(255, 255, 255, 0.03); --border: rgba(255, 255, 255, 0.1); --text-muted: rgba(230, 238, 248, 0.6); }
-  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; background-color: var(--bg-1); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-x: hidden; }
-  
-  .bg-canvas { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, var(--bg-1), var(--bg-2)); overflow: hidden; }
-  .floating-char { position: absolute; color: rgba(255,255,255,0.04); font-weight: 900; user-select: none; pointer-events: none; animation: floatUp linear infinite; }
-  @keyframes floatUp { 0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
-
-  .card { width: 100%; max-width: 520px; padding: 40px; border-radius: 28px; background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(25px); box-shadow: 0 40px 100px rgba(0,0,0,0.6); }
-  .badge { display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(74, 222, 128, 0.1); color: #4ade80; font-size: 11px; font-weight: 800; letter-spacing: 1px; margin-bottom: 16px; border: 1px solid rgba(74, 222, 128, 0.3); }
-  h1 { font-size: 28px; margin: 0 0 8px; font-weight: 800; }
-  
-  label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 8px; color: var(--brand); text-transform: uppercase; }
-  input, select, textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-size: 14px; outline: none; margin-bottom: 15px; box-sizing: border-box; }
-  
-  .btn { width: 100%; padding: 16px; border-radius: 14px; border: 0; background: var(--brand); color: #fff; font-weight: 800; cursor: pointer; transition: 0.3s; }
+  /* [MATCHED CSS FOR CONSISTENCY] */
+  :root { --brand: #2b65ff; --bg-dark: #020a18; --glass: rgba(255, 255, 255, 0.02); --border: rgba(255, 255, 255, 0.08); }
+  body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; overflow-x: hidden; }
+  .bg-container { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #04142d 0%, #020a18 100%); overflow: hidden; }
+  .blob { position: absolute; width: 400px; height: 400px; background: #4ade80; filter: blur(120px); border-radius: 50%; opacity: 0.1; animation: pulse 12s infinite alternate; }
+  .float-char { position: absolute; color: rgba(255,255,255,0.05); font-weight: 900; animation: infiniteFloat linear infinite; }
+  @keyframes infiniteFloat { from { transform: translateY(110vh) rotate(0deg); } to { transform: translateY(-20vh) rotate(360deg); } }
+  .card { width: 100%; max-width: 500px; padding: 40px; border-radius: 32px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); backdrop-filter: blur(30px); position: relative; }
+  .badge { display: inline-flex; padding: 6px 14px; border-radius: 100px; background: rgba(74, 222, 128, 0.1); border: 1px solid rgba(74, 222, 128, 0.2); color: #4ade80; font-size: 11px; font-weight: 800; text-transform: uppercase; margin-bottom: 20px; }
+  h1 { font-size: 30px; margin: 0 0 10px; font-weight: 800; }
+  label { display: block; font-size: 11px; font-weight: 700; color: var(--brand); text-transform: uppercase; margin-bottom: 6px; }
+  input, select, textarea { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: rgba(0,0,0,0.3); color: #fff; font-size: 14px; margin-bottom: 15px; outline: none; }
+  .btn { width: 100%; padding: 18px; border-radius: 16px; border: 0; background: var(--brand); color: #fff; font-weight: 800; cursor: pointer; box-shadow: 0 10px 30px rgba(43, 101, 255, 0.3); }
 </style>
 </head>
 <body>
 
-  <div class="bg-canvas" id="bgEngine"></div>
+  <div class="bg-container" id="bg">
+    <div class="blob" style="top:-10%; left:-10%;"></div>
+  </div>
 
   <div class="card">
-    <div class="badge">BANNER REQUEST</div>
+    <div class="badge">✓ Priority Designer Access</div>
     <h1>Custom Creative</h1>
-    <p style="color:var(--text-muted); font-size:14px; margin-bottom:25px;">Provide your account details and requirements for a personalized 1XBET banner.</p>
+    <p style="color:rgba(255,255,255,0.5); font-size:14px; margin-bottom:25px;">Get high-converting 1XBET banners tailored to your account.</p>
 
-    <form onsubmit="event.preventDefault(); alert('Request sent to the design team.');">
-      <label>Promo Code</label>
-      <input type="text" placeholder="e.g. ZAYN1x" required>
+    <form onsubmit="event.preventDefault(); alert('Creative request sent.');">
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+        <div>
+          <label>Promo Code</label>
+          <input type="text" placeholder="e.g. ZAYN1x" required>
+        </div>
+        <div>
+          <label>Account ID</label>
+          <input type="text" placeholder="1234567" required>
+        </div>
+      </div>
 
-      <label>Account ID</label>
-      <input type="text" placeholder="Your affiliate ID" required>
-
-      <label>Banner Dimensions</label>
+      <label>Size / Dimensions</label>
       <select required>
-        <option value="">Choose size...</option>
-        <option>1080x1080 (Instagram/FB Square)</option>
-        <option>1080x1920 (TikTok/Stories)</option>
-        <option>728x90 (Leaderboard)</option>
-        <option>300x250 (Sidebar)</option>
+        <option>1080x1080 (Instagram)</option>
+        <option>1080x1920 (Story/TikTok)</option>
+        <option>728x90 (Banner)</option>
       </select>
 
-      <label>Content / Main Text</label>
-      <textarea rows="2" placeholder="What should the banner say? (e.g. 200% Bonus)"></textarea>
+      <label>Message / Offer</label>
+      <textarea rows="2" placeholder="e.g. 200% First Deposit Bonus"></textarea>
 
-      <label>Reference Image (Upload)</label>
-      <input type="file" style="border: 2px dashed var(--border); background: none; padding: 20px;">
+      <label>Reference Image</label>
+      <input type="file" style="padding:15px; border:2px dashed var(--border); background:none;">
 
-      <button type="submit" class="btn">Request Banner</button>
+      <button type="submit" class="btn">Order Banner</button>
     </form>
   </div>
 
   <script>
-    const engine = document.getElementById('bgEngine');
+    const bg = document.getElementById('bg');
     const chars = ['1', 'X', 'B', 'E', 'T'];
-    function createChar() {
+    function createChar(init) {
       const el = document.createElement('div');
-      el.className = 'floating-char';
+      el.className = 'float-char';
       el.innerText = chars[Math.floor(Math.random() * chars.length)];
-      el.style.left = Math.random() * 100 + 'vw';
-      el.style.fontSize = (Math.random() * 60 + 30) + 'px';
-      el.style.animationDuration = (Math.random() * 12 + 8) + 's';
-      engine.appendChild(el);
-      setTimeout(() => el.remove(), 20000);
+      const dur = Math.random() * 15 + 10;
+      el.style.fontSize = (Math.random() * 60 + 20) + 'px';
+      el.style.left = (Math.random() * 100) + 'vw';
+      el.style.animationDuration = dur + 's';
+      if(init) el.style.bottom = (Math.random() * 120) + 'vh';
+      else el.style.bottom = '-20vh';
+      bg.appendChild(el);
+      setTimeout(() => el.remove(), dur * 1000);
     }
-    for(let i=0; i<12; i++) createChar();
-    setInterval(createChar, 2000);
+    for(let i=0; i<20; i++) createChar(true);
+    setInterval(() => createChar(false), 1000);
   </script>
 </body>
 </html>
